@@ -8,12 +8,12 @@ import csv
 
 # --- Setup Firefox ---
 options = Options()
-# options.add_argument("--headless")  # optional, remove if you want to see browser
+# options.add_argument("--headless")  # optional
 service = Service(GeckoDriverManager().install())
 driver = webdriver.Firefox(service=service, options=options)
 
 # --- Open Maps Search ---
-url = "https://www.google.com/maps/search/plumbers+in+Lowell,+MA,+USA/@42.5400664,-71.203366,10z/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI1MTAyMC4wIKXMDSoASAFQAw%3D%3D"
+url = "https://www.google.com/maps/search/plumbers+in+Lowell,+MA,+USA/@42.6313223,-73.6274519,8z/data=!3m1!4b1"
 driver.get(url)
 time.sleep(5)
 
@@ -45,25 +45,30 @@ for listing in listings:
     name_tag = listing.select_one("a.hfpxzc")
     rating_tag = listing.select_one("span.MW4etd")
     phone_tag = listing.select_one("span.UsdlK")
-    website_tag = listing.select_one("a[href^='http']")
-    
+
+    # Get the actual external website (ignore google.com links)
+    website_link = ""
+    for a_tag in listing.select("a"):
+        href = a_tag.get("href", "")
+        if href and "google.com" not in href and href.startswith("http"):
+            website_link = href
+            break
+
     name = name_tag["aria-label"].strip() if name_tag else ""
     rating = rating_tag.get_text(strip=True) if rating_tag else ""
     phone = phone_tag.get_text(strip=True) if phone_tag else ""
-    website = website_tag["href"] if website_tag else ""
 
     data.append({
         "Name": name,
         "Phone": phone,
         "Rating": rating,
-        "Website": website
+        "Website": website_link
     })
 
 # --- Save to CSV ---
-with open("plumbers_lowell_ma.csv", "w", newline="", encoding="utf-8") as f:
+with open("electricians_lowell_ma.csv", "w", newline="", encoding="utf-8") as f:
     writer = csv.DictWriter(f, fieldnames=["Name", "Phone", "Rating", "Website"])
     writer.writeheader()
     writer.writerows(data)
 
 print(f"✅ Saved {len(data)} results to electricians_lowell_ma.csv")
-
