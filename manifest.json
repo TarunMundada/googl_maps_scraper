@@ -1,0 +1,29 @@
+{
+  "manifest_version": 2,
+  "name": "Google Maps Business Scraper",
+  "version": "1.0.0",
+  "description": "Scrape Google Maps business listings (name, phone, rating, address, website) and export them to CSV.",
+  "permissions": [
+    "activeTab",
+    "downloads",
+    "tabs",
+    "https://www.google.com/maps/*"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": "icons/icon48.png"
+  },
+  "icons": {
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.google.com/maps/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
